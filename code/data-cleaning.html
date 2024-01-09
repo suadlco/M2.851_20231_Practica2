@@ -444,8 +444,8 @@ head(data)</code></pre>
 <h1><span class="header-section-number">2</span> Limpieza de los
 datos</h1>
 <hr />
-<p>En este apartado vamos a realizar la limpeiza de datos. Para ello,
-analizaremos los elementos vacíos que hay en el cnojunto de datos, así
+<p>En este apartado vamos a realizar la limpieza de datos. Para ello,
+analizaremos los elementos vacíos que hay en el conjunto de datos, así
 como los ceros y su significado.</p>
 <div id="ceros-y-elementos-vacíos" class="section level2" number="2.1">
 <h2><span class="header-section-number">2.1</span> Ceros y elementos
@@ -478,7 +478,7 @@ conjunto de datos). En el caso de la columna oldpeak, se representan la
 cantidad de milímetros (mm) de depresión del segmento ST en el
 electrocardiograma (ECG) durante la prueba de esfuerzo, por lo que
 también es coherente que haya valores de cero dependiendo de cómo se
-haya realizado la medición de los datos.Por ello, podemos concluir que
+haya realizado la medición de los datos. Por ello, podemos concluir que
 se ha realizado una correcta limpieza sobre los datos, al menos respecto
 a los valores nulos y los ceros. A continuación vamos a analizar los
 valores extremos (outliers).</p>
@@ -500,8 +500,8 @@ for (col in colnames(data)) {
 Como podemos observar, hay algunos casos en el que se detectan como
 valores extremos algunos de los códigos especificados para esa columna.
 Por ejemplo, en el caso de la columna fbs, sabemos que los códigos son 1
-y 0, por lo que en este caso el el valor 1 no es un valor extremo sino
-poco común. Lo mismo ocurre con la columna thall.</p>
+y 0, por lo que en este caso el valor 1 no es un valor extremo sino poco
+común. Lo mismo ocurre con la columna thall.</p>
 <p>En el caso de la columna caa, ocurre algo parecido para el valor de
 3, que se detecta como valor extremo cuando realmente es un código
 especificado. Sin embargo, para esta columna no se ha definido ningún
@@ -549,14 +549,14 @@ datos</h1>
 entre pacientes con y sin ataques al corazón, con la finalidad de
 identificar las características clínicas de ambos grupos.</p>
 <p>Por otro lado, podemos realizar otro análisis comparativo respecto al
-género, con el objetivo de expolrar si hay diferencias significativas en
+género, con el objetivo de explorar si hay diferencias significativas en
 las características clínicas entre hombres y mujeres, descubriendo qué
-características cardíacas influyen más en las salud de cada género, como
+características cardíacas influyen más en la salud de cada género, como
 la frecuencia cardíaca máxima o la presión arterial.</p>
 <p>En primer lugar, vamos a comprobar la normalidad y homogeneidad de la
 varianza. Para ello, analizaremos la normalidad de aquellas variables
 que no sean categóricas. Para revisar si las variables pueden ser
-candidatas a la normalización miramos las graficas de quantile-quantile
+candidatas a la normalización miramos las gráficas de quantile-quantile
 plot y el histograma.</p>
 <pre class="r"><code># Convertir las columnas a tipo categórico
 columnas_categoricas &lt;- c(&quot;sex&quot;, &quot;exng&quot;, &quot;caa&quot;, &quot;cp&quot;, &quot;fbs&quot;, &quot;restecg&quot;, &quot;thall&quot;, &quot;slp&quot;, &quot;output&quot;)
@@ -579,7 +579,7 @@ puntos en los extremos se desvían de la recta. Esto puede significar que
 en los extremos no siguen exactamente una distribución normal, siendo
 una posible causa la existencia de valores extremos.</p>
 <p>Para revisar si las variables estan normalizadas vamos a aplicar el
-test de Shapiro Wilk en cada variables numérica.</p>
+test de Shapiro Wilk en cada variable numérica.</p>
 <pre class="r"><code>shapiro.test(data$age)</code></pre>
 <pre><code>## 
 ##  Shapiro-Wilk normality test
@@ -612,7 +612,7 @@ test de Shapiro Wilk en cada variables numérica.</p>
 ## W = 0.84854, p-value &lt; 2.2e-16</code></pre>
 <p>El p-value es inferior al coeficiente 0.05, por lo que se puede
 rechazar la hipotesis nula, significando que ninguna variable está
-normalizada. Aún así, según el teorema del limite central al tener mas
+normalizada. Aun así, según el teorema del límite central al tener más
 de 30 elementos en las observaciones podemos aproximarla como una
 distribución normal de media 0 y desviación estandard 1.</p>
 <p>A continuación, vamos a comprobar la homogeneidad de la varianza
@@ -866,7 +866,7 @@ print(matriz_cor)</code></pre>
 <p>En esta matriz de correlación podemos observar que la correlación más
 significativa para la variable cp es con la variable exng. Esta
 correlación puede tener sentido, ya que ambas variables representan el
-dolor en el pecho en diferentes situaciones.Por otro lado, la
+dolor en el pecho en diferentes situaciones. Por otro lado, la
 correlación más significativa para la variable caa es con el hecho de
 sufrir un ataque al corazón o no, lo que refuerza la idea de que la
 variable caa es realmente significativa a la hora de determinar si un

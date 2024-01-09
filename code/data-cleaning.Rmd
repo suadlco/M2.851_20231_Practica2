@@ -3,16 +3,16 @@ title: "PRÁCTICA 2"
 author: "Víctor Manuel Miñambres y Sua de la Cruz"
 date: "9 de enero de 2024"
 output:
+  pdf_document:
+    latex_engine: xelatex
+    toc: yes
+    toc_depth: '2'
   html_document:
     highlight: default
     number_sections: yes
     theme: cosmo
     toc: yes
     toc_depth: 2
-  pdf_document:
-    latex_engine: xelatex
-    toc: yes
-    toc_depth: '2'
 ---
 
 ****
