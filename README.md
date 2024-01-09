@@ -8,6 +8,7 @@
 ## Descripción del Repositorio
 
 Este repositorio contiene los archivos y el código relacionados con el análisis de datos realizado por el grupo. El dataset que hemos utilizado contiene datos para el análisis y predicción de ataques al corazón. Este conjunto de datos está disponible en el siguiente enlace: https://www.kaggle.com/datasets/rashikrahmanpritom/heart-attack-analysis-prediction-dataset/data
+
 A continuación, se describen los componentes principales:
 
 ### Carpeta de Código (code)
