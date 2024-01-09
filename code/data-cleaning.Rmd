@@ -31,7 +31,7 @@ summary(data)
 ****
 # Limpieza de los datos
 ****
-En este apartado vamos a realizar la limpeiza de datos. Para ello, analizaremos los elementos vacíos que hay en el cnojunto de datos, así como los ceros y su significado.
+En este apartado vamos a realizar la limpieza de datos. Para ello, analizaremos los elementos vacíos que hay en el conjunto de datos, así como los ceros y su significado.
 
 ## Ceros y elementos vacíos
 
@@ -42,7 +42,7 @@ for (col in colnames(data)) {
   cat("La columna", col, ifelse(any(data[, col] == 0), "SÍ", "NO"), "contiene ceros\n")
 }
 ```
-En las columnas en las que encontramos ceros es coherente encontrar estos valores. Es decir, el número 0 es un indicador para algunas de las columnas (se interpreta como "NO" o "Falso" en alguno de los casos, en otros casos es un indicador que ha sido definido en la descripción del conjunto de datos). En el caso de la columna oldpeak, se representan la cantidad de milímetros (mm) de depresión del segmento ST en el electrocardiograma (ECG) durante la prueba de esfuerzo, por lo que también es coherente que haya valores de cero dependiendo de cómo se haya realizado la medición de los datos.Por ello, podemos concluir que se ha realizado una correcta limpieza sobre los datos, al menos respecto a los valores nulos y los ceros. A continuación vamos a analizar los valores extremos (outliers).
+En las columnas en las que encontramos ceros es coherente encontrar estos valores. Es decir, el número 0 es un indicador para algunas de las columnas (se interpreta como "NO" o "Falso" en alguno de los casos, en otros casos es un indicador que ha sido definido en la descripción del conjunto de datos). En el caso de la columna oldpeak, se representan la cantidad de milímetros (mm) de depresión del segmento ST en el electrocardiograma (ECG) durante la prueba de esfuerzo, por lo que también es coherente que haya valores de cero dependiendo de cómo se haya realizado la medición de los datos. Por ello, podemos concluir que se ha realizado una correcta limpieza sobre los datos, al menos respecto a los valores nulos y los ceros. A continuación vamos a analizar los valores extremos (outliers).
 
 
 ## Valores extremos
@@ -62,7 +62,7 @@ for (col in colnames(data)) {
   boxplot(data[, col], main=col)
 }
 ```
-Como podemos observar, hay algunos casos en el que se detectan como valores extremos algunos de los códigos especificados para esa columna. Por ejemplo, en el caso de la columna fbs, sabemos que los códigos son 1 y 0, por lo que en este caso el el valor 1 no es un valor extremo sino poco común. Lo mismo ocurre con la columna thall. 
+Como podemos observar, hay algunos casos en el que se detectan como valores extremos algunos de los códigos especificados para esa columna. Por ejemplo, en el caso de la columna fbs, sabemos que los códigos son 1 y 0, por lo que en este caso el valor 1 no es un valor extremo sino poco común. Lo mismo ocurre con la columna thall. 
 
 En el caso de la columna caa, ocurre algo parecido para el valor de 3, que se detecta como valor extremo cuando realmente es un código especificado. Sin embargo, para esta columna no se ha definido ningún código cuyo valor sea 4, por lo que en este caso sí podemos asumir que 4 es un valor erróneo. Como carecemos de contexto, no sabemos si este valor representa un código que desconocemos o si se debe a un error de codificación. En este caso, se puede optar por ignorar los casos en los que la columna caa tenga el valor 4 (cinco registros) o asumir que ha sido un error y cambiar el valor a 3. En nuestro caso, vamos a optar por ignorar estos registros.
 
@@ -93,10 +93,10 @@ data<-data[data$caa<4,]
 
 Por un lado, resulta interesante realizar un análisis comparativo entre pacientes con y sin ataques al corazón, con la finalidad de identificar las características clínicas de ambos grupos. 
 
-Por otro lado, podemos realizar otro análisis comparativo respecto al género, con el objetivo de expolrar si hay diferencias significativas en las características clínicas entre hombres y mujeres, descubriendo qué características cardíacas influyen más en las salud de cada género, como la frecuencia cardíaca máxima o la presión arterial. 
+Por otro lado, podemos realizar otro análisis comparativo respecto al género, con el objetivo de explorar si hay diferencias significativas en las características clínicas entre hombres y mujeres, descubriendo qué características cardíacas influyen más en la salud de cada género, como la frecuencia cardíaca máxima o la presión arterial. 
 
 
-En primer lugar, vamos a comprobar la normalidad y homogeneidad de la varianza. Para ello, analizaremos la normalidad de aquellas variables que no sean categóricas. Para revisar si las variables pueden ser candidatas a la normalización miramos las graficas de quantile-quantile plot y el histograma.
+En primer lugar, vamos a comprobar la normalidad y homogeneidad de la varianza. Para ello, analizaremos la normalidad de aquellas variables que no sean categóricas. Para revisar si las variables pueden ser candidatas a la normalización miramos las gráficas de quantile-quantile plot y el histograma.
 ```{r ,eval=TRUE,echo=TRUE}
 # Convertir las columnas a tipo categórico
 columnas_categoricas <- c("sex", "exng", "caa", "cp", "fbs", "restecg", "thall", "slp", "output")
@@ -115,7 +115,7 @@ for(i in colnames(data)) {
 
 Como podemos ver en los gráficos, las variables pueden ser candidatas a la normalización si es necesario, exceptuando la variable oldpeak. Aún así, observamos que en las columnas de la edad, trtbps y chol, los puntos en los extremos se desvían de la recta. Esto puede significar que en los extremos no siguen exactamente una distribución normal, siendo una posible causa la existencia de valores extremos.
 
-Para revisar si las variables estan normalizadas vamos a aplicar el test de Shapiro Wilk en cada variables numérica.
+Para revisar si las variables estan normalizadas vamos a aplicar el test de Shapiro Wilk en cada variable numérica.
 
 ```{r ,eval=TRUE,echo=TRUE}
 shapiro.test(data$age)
@@ -137,7 +137,7 @@ shapiro.test(data$thalachh)
 shapiro.test(data$oldpeak)
 ```
 
-El p-value es inferior al coeficiente 0.05, por lo que se puede rechazar la hipotesis nula, significando que ninguna variable está normalizada. Aún así, según el teorema del limite central al tener mas de 30 elementos en las observaciones podemos aproximarla como una distribución normal de media 0 y desviación estandard 1.
+El p-value es inferior al coeficiente 0.05, por lo que se puede rechazar la hipotesis nula, significando que ninguna variable está normalizada. Aun así, según el teorema del límite central al tener más de 30 elementos en las observaciones podemos aproximarla como una distribución normal de media 0 y desviación estandard 1.
 
 A continuación, vamos a comprobar la homogeneidad de la varianza mediante el test de levene:
 
@@ -203,7 +203,7 @@ print(matriz_cor)
 corrplot(matriz_cor, method = "color", type = "upper", order = "hclust", tl.col = "black", tl.srt = 45)
 ```
 
-En esta matriz de correlación podemos observar que la correlación más significativa para la variable cp es con la variable exng. Esta correlación puede tener sentido, ya que ambas variables representan el dolor en el pecho en diferentes situaciones.Por otro lado, la correlación más significativa para la variable caa es con el hecho de sufrir un ataque al corazón o no, lo que refuerza la idea de que la variable caa es realmente significativa a la hora de determinar si un paciente puede sufrir un ataque al corazón.
+En esta matriz de correlación podemos observar que la correlación más significativa para la variable cp es con la variable exng. Esta correlación puede tener sentido, ya que ambas variables representan el dolor en el pecho en diferentes situaciones. Por otro lado, la correlación más significativa para la variable caa es con el hecho de sufrir un ataque al corazón o no, lo que refuerza la idea de que la variable caa es realmente significativa a la hora de determinar si un paciente puede sufrir un ataque al corazón.
 
 
 ```{r ,eval=TRUE,echo=TRUE}
