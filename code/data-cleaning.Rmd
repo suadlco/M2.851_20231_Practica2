@@ -96,11 +96,10 @@ Por un lado, resulta interesante realizar un análisis comparativo entre pacient
 Por otro lado, podemos realizar otro análisis comparativo respecto al género, con el objetivo de expolrar si hay diferencias significativas en las características clínicas entre hombres y mujeres, descubriendo qué características cardíacas influyen más en las salud de cada género, como la frecuencia cardíaca máxima o la presión arterial. 
 
 
-En primer lugar, vamos a comprobar la normalidad y homogeneidad de la varianza. Para ello, primero vamos a transformar las columnas categóricas, y analizaremos la normalidad de aquellas variables que no sean categóricas. Para revisar si las variables pueden ser candidatas a la normalización miramos las graficas de quantile-quantile plot y el histograma.
+En primer lugar, vamos a comprobar la normalidad y homogeneidad de la varianza. Para ello, analizaremos la normalidad de aquellas variables que no sean categóricas. Para revisar si las variables pueden ser candidatas a la normalización miramos las graficas de quantile-quantile plot y el histograma.
 ```{r ,eval=TRUE,echo=TRUE}
 # Convertir las columnas a tipo categórico
 columnas_categoricas <- c("sex", "exng", "caa", "cp", "fbs", "restecg", "thall", "slp", "output")
-data[columnas_categoricas] <- lapply(data[columnas_categoricas], as.factor)
 
 par(mfrow=c(2,2))
 for(i in colnames(data)) {
@@ -156,29 +155,62 @@ Como podemos observar, para las variables trtbps y chol no hay evidencia signifi
 
 ## Aplicación de pruebas estadisticas
 
+En primer lugar, vamos a generar un modelo de regresión lineal para intentar predecir si un paciente va a tener un ataque al corazón dependiendo de sus características clínicas.
+```{r ,eval=TRUE,echo=TRUE}
+modelo_lm <- lm(output ~ age + sex + cp + trtbps + chol + fbs + restecg + thalachh + exng + oldpeak + slp + caa + thall, data = data)
+summary(modelo_lm)
+
+predicciones <- predict(modelo_lm, newdata = data)
+umbral <- 0.5
+predicciones_binarias <- ifelse(predicciones > umbral, 1, 0)
+conf_matrix <- table(data$output, predicciones_binarias)
+accuracy <- sum(diag(conf_matrix)) / sum(conf_matrix)
+cat("Precisión del modelo:", round(accuracy, 3), "\n")
+```
+
+Podemos observar que las variables más significativas son el género, cp, caa y thall. Por ello, vamos a generar otros dos modelos, diferenciando por género, para ver el rendimiento de estos nuevos modelos y observar si las características clínicas relevantes cambian dependiendo del género.
 
 ```{r ,eval=TRUE,echo=TRUE}
+modelo_hombres <- lm(output ~ age + cp + trtbps + chol + fbs + restecg + thalachh + exng + oldpeak + slp + caa + thall, data = subset(data, sex == 1))
+modelo_mujeres <- lm(output ~ age + cp + trtbps + chol + fbs + restecg + thalachh + exng + oldpeak + slp + caa + thall, data = subset(data, sex == 0))
+cat("Resumen del modelo para hombres:\n")
+summary(modelo_hombres)
+predicciones <- predict(modelo_hombres, newdata = subset(data, sex == 1))
+umbral <- 0.5
+predicciones_binarias <- ifelse(predicciones > umbral, 1, 0)
+conf_matrix <- table(subset(data, sex == 1)$output, predicciones_binarias)
+accuracy <- sum(diag(conf_matrix)) / sum(conf_matrix)
+cat("Precisión del modelo:", round(accuracy, 3), "\n")
 
+cat("\nResumen del modelo para mujeres:\n")
+summary(modelo_mujeres)
+predicciones <- predict(modelo_mujeres, newdata = subset(data, sex == 0))
+umbral <- 0.5
+predicciones_binarias <- ifelse(predicciones > umbral, 1, 0)
+conf_matrix <- table(subset(data, sex == 0)$output, predicciones_binarias)
+accuracy <- sum(diag(conf_matrix)) / sum(conf_matrix)
+cat("Precisión del modelo:", round(accuracy, 3), "\n")
+```
+
+Analizando los resultados de ambos modelos, podemos observar que las características clínicas relevantes son parecidas para ambos géneros. De estas características destacan el cp (dolor de pecho) y el caa (cantidad de vasos sanguíneos principales que se pueden visualizar con fluoroscopia) como las más significativas. También podemos observar que si hacemos las predicciones por género, la precisión en las mujeres aumenta significativamente.
+
+Por último vamos a analizar la correlación de las variables más significativas respecto al resto de variables.
+
+```{r ,eval=TRUE,echo=TRUE}
+library(corrplot)
+matriz_cor <- cor(data)
+print(matriz_cor)
+corrplot(matriz_cor, method = "color", type = "upper", order = "hclust", tl.col = "black", tl.srt = 45)
+```
+
+En esta matriz de correlación podemos observar que la correlación más significativa para la variable cp es con la variable exng. Esta correlación puede tener sentido, ya que ambas variables representan el dolor en el pecho en diferentes situaciones.Por otro lado, la correlación más significativa para la variable caa es con el hecho de sufrir un ataque al corazón o no, lo que refuerza la idea de que la variable caa es realmente significativa a la hora de determinar si un paciente puede sufrir un ataque al corazón.
+
+
+```{r ,eval=TRUE,echo=TRUE}
+write.csv(data, file.path(dirname(getwd()), "data", "heart_out.csv"), row.names = FALSE)
 ```
 
 
-
-```{r ,eval=TRUE,echo=TRUE}
-
-```
-
-
-
-
-****
-# Representación de los resultados a partir de tablas y gráficas
-****
-
-
-
-****
-# Resolución del problema y conclusiones
-****
 
 
 
