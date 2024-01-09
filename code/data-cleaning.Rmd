@@ -1,0 +1,185 @@
+---
+title: 'PRÁCTICA 2'
+author: "Víctor Manuel Miñambres y Sua de la Cruz "
+date: '`r format(Sys.Date(),"%e de %B %Y")`'
+output:
+  html_document:
+    toc: yes
+    number_sections: yes
+    toc_depth: 2
+---
+
+****
+# Descripción del dataset.
+****
+
+
+
+****
+# Carga y resumen de los datos
+****
+En primer lugar, vamos a cargar y resumir los datos, con la finalidad de tener una priemra impresión de los datos.
+```{r,eval=TRUE,echo=TRUE}
+ruta <- file.path(dirname(getwd()), "data", "heart.csv")
+data <- read.csv(ruta)
+head(data)
+```
+```{r,eval=TRUE,echo=TRUE}
+summary(data)
+```
+
+****
+# Limpieza de los datos
+****
+En este apartado vamos a realizar la limpeiza de datos. Para ello, analizaremos los elementos vacíos que hay en el cnojunto de datos, así como los ceros y su significado.
+
+## Ceros y elementos vacíos
+
+```{r, echo=TRUE}
+# Verificar los valores nulos y si cada columna contiene ceros
+cat("Los datos", ifelse(any(is.na(data)), "SÍ", "NO"), "contienen valores nulos\n")
+for (col in colnames(data)) {
+  cat("La columna", col, ifelse(any(data[, col] == 0), "SÍ", "NO"), "contiene ceros\n")
+}
+```
+En las columnas en las que encontramos ceros es coherente encontrar estos valores. Es decir, el número 0 es un indicador para algunas de las columnas (se interpreta como "NO" o "Falso" en alguno de los casos, en otros casos es un indicador que ha sido definido en la descripción del conjunto de datos). En el caso de la columna oldpeak, se representan la cantidad de milímetros (mm) de depresión del segmento ST en el electrocardiograma (ECG) durante la prueba de esfuerzo, por lo que también es coherente que haya valores de cero dependiendo de cómo se haya realizado la medición de los datos.Por ello, podemos concluir que se ha realizado una correcta limpieza sobre los datos, al menos respecto a los valores nulos y los ceros. A continuación vamos a analizar los valores extremos (outliers).
+
+
+## Valores extremos
+En este apartado vamos a observar los valores extremos que hay en el conjunto de datos mediante histogramas y diagramas de caja.
+
+```{r,eval=TRUE,echo=TRUE}
+par(mfrow=c(3, 5))
+for (col in colnames(data)) {
+  hist(data[, col], main=col, xlab="value")
+}
+```
+
+
+```{r, echo=TRUE}
+par(mfrow=c(2, 7))
+for (col in colnames(data)) {
+  boxplot(data[, col], main=col)
+}
+```
+Como podemos observar, hay algunos casos en el que se detectan como valores extremos algunos de los códigos especificados para esa columna. Por ejemplo, en el caso de la columna fbs, sabemos que los códigos son 1 y 0, por lo que en este caso el el valor 1 no es un valor extremo sino poco común. Lo mismo ocurre con la columna thall. 
+
+En el caso de la columna caa, ocurre algo parecido para el valor de 3, que se detecta como valor extremo cuando realmente es un código especificado. Sin embargo, para esta columna no se ha definido ningún código cuyo valor sea 4, por lo que en este caso sí podemos asumir que 4 es un valor erróneo. Como carecemos de contexto, no sabemos si este valor representa un código que desconocemos o si se debe a un error de codificación. En este caso, se puede optar por ignorar los casos en los que la columna caa tenga el valor 4 (cinco registros) o asumir que ha sido un error y cambiar el valor a 3. En nuestro caso, vamos a optar por ignorar estos registros.
+
+Por otro lado, podemos observar que en las columnas trtbps, chol, thalachh y oldpeak se detectan valores extremos, por lo que vamos a hacer un análisis más detallado de estas columnas para determinar si son valores erróneos o no.
+
+```{r,eval=TRUE,echo=TRUE}
+values <- c("mmHg", "mg/dl", "maximun heart rate", "mm")
+names <- c("trtbps", "chol", "thalachh", "oldpeak")
+par(mfrow=c(2, 2))
+for (col in c(1:4)) {
+  hist(data[, names[col]], main=names[col], xlab=values[col])
+}
+```
+
+Teniendo en cuenta que el contexto del conjunto de datos son los ataques al corazón, no es raro que los valores de la columna trtbps (presión arterial en reposo) lleguen a 200. Por otro lado, respecto a la columna thalachh, una frecuencia cardíaca máxima de 71 latidos por minuto podría considerarse normal en reposo para muchos adultos, por lo que vamos a asumir que no es un valor erróneo, a pesar de ser extremo respecto al conjunto de datos. 
+
+Respecto a los valores extremos de las columnas chol y oldpeak, teniendo en cuenta el contexto del conjunto de datos, no son valores tan extremos como para considerarlos erróneos, por lo que no los vamos a modificar.
+
+A continuación, ignoramos los registros en los que la columna caa tiene el valor de 4. Una vez realizada la limpeiza de datos, podemos comenzar con el análisis de datos.
+
+```{r,eval=TRUE,echo=TRUE}
+data<-data[data$caa<4,]
+```
+
+****
+# Análisis de los datos
+****
+
+Por un lado, resulta interesante realizar un análisis comparativo entre pacientes con y sin ataques al corazón, con la finalidad de identificar las características clínicas de ambos grupos. 
+
+Por otro lado, podemos realizar otro análisis comparativo respecto al género, con el objetivo de expolrar si hay diferencias significativas en las características clínicas entre hombres y mujeres, descubriendo qué características cardíacas influyen más en las salud de cada género, como la frecuencia cardíaca máxima o la presión arterial. 
+
+
+En primer lugar, vamos a comprobar la normalidad y homogeneidad de la varianza. Para ello, primero vamos a transformar las columnas categóricas, y analizaremos la normalidad de aquellas variables que no sean categóricas. Para revisar si las variables pueden ser candidatas a la normalización miramos las graficas de quantile-quantile plot y el histograma.
+```{r ,eval=TRUE,echo=TRUE}
+# Convertir las columnas a tipo categórico
+columnas_categoricas <- c("sex", "exng", "caa", "cp", "fbs", "restecg", "thall", "slp", "output")
+data[columnas_categoricas] <- lapply(data[columnas_categoricas], as.factor)
+
+par(mfrow=c(2,2))
+for(i in colnames(data)) {
+  if (!i%in%columnas_categoricas) {
+    qqnorm(data[,i],main = paste("Normal Q-Q Plot de",i))
+    qqline(data[,i],col="red")
+    hist(data[,i], 
+      main=paste("Histograma de", i), 
+      xlab=colnames(data)[i], freq = FALSE)
+  }
+}
+```
+
+Como podemos ver en los gráficos, las variables pueden ser candidatas a la normalización si es necesario, exceptuando la variable oldpeak. Aún así, observamos que en las columnas de la edad, trtbps y chol, los puntos en los extremos se desvían de la recta. Esto puede significar que en los extremos no siguen exactamente una distribución normal, siendo una posible causa la existencia de valores extremos.
+
+Para revisar si las variables estan normalizadas vamos a aplicar el test de Shapiro Wilk en cada variables numérica.
+
+```{r ,eval=TRUE,echo=TRUE}
+shapiro.test(data$age)
+```
+
+```{r ,eval=TRUE,echo=TRUE}
+shapiro.test(data$trtbps)
+```
+
+```{r ,eval=TRUE,echo=TRUE}
+shapiro.test(data$chol)
+```
+
+```{r ,eval=TRUE,echo=TRUE}
+shapiro.test(data$thalachh)
+```
+
+```{r ,eval=TRUE,echo=TRUE}
+shapiro.test(data$oldpeak)
+```
+
+El p-value es inferior al coeficiente 0.05, por lo que se puede rechazar la hipotesis nula, significando que ninguna variable está normalizada. Aún así, según el teorema del limite central al tener mas de 30 elementos en las observaciones podemos aproximarla como una distribución normal de media 0 y desviación estandard 1.
+
+A continuación, vamos a comprobar la homogeneidad de la varianza mediante el test de levene:
+
+```{r ,eval=TRUE,echo=TRUE}
+library(car)
+
+for (col in columnas_numéricas) {
+  cat(col,":\n")
+  print(leveneTest(data[[col]] ~ data$output))
+  cat("\n")
+}
+```
+Como podemos observar, para las variables trtbps y chol no hay evidencia significativa para rechazar la hipótesis nula, lo que significa que no se encuentra falta de homogeneidad de varianza para las variables. Sucede lo contrario con las variables age, thalachh y oldpeak, para las que sí hay evidencia para rechazar la hipótesis nula.
+
+
+## Aplicación de pruebas estadisticas
+
+
+```{r ,eval=TRUE,echo=TRUE}
+
+```
+
+
+
+```{r ,eval=TRUE,echo=TRUE}
+
+```
+
+
+
+
+****
+# Representación de los resultados a partir de tablas y gráficas
+****
+
+
+
+****
+# Resolución del problema y conclusiones
+****
+
+
+
+
