@@ -1,19 +1,19 @@
 ---
-title: 'PRÁCTICA 2'
-author: "Víctor Manuel Miñambres y Sua de la Cruz "
-date: '`r format(Sys.Date(),"%e de %B %Y")`'
+title: "PRÁCTICA 2"
+author: "Víctor Manuel Miñambres y Sua de la Cruz"
+date: "9 de enero de 2024"
 output:
   html_document:
-    toc: yes
+    highlight: default
     number_sections: yes
+    theme: cosmo
+    toc: yes
     toc_depth: 2
+  pdf_document:
+    latex_engine: xelatex
+    toc: yes
+    toc_depth: '2'
 ---
-
-****
-# Descripción del dataset.
-****
-
-
 
 ****
 # Carga y resumen de los datos
@@ -143,10 +143,10 @@ A continuación, vamos a comprobar la homogeneidad de la varianza mediante el te
 
 ```{r ,eval=TRUE,echo=TRUE}
 library(car)
-
+columnas_numéricas<-c("age", "trtbps", "chol", "thalachh", "oldpeak")
 for (col in columnas_numéricas) {
   cat(col,":\n")
-  print(leveneTest(data[[col]] ~ data$output))
+  print(leveneTest(data[[col]] ~ factor(data$output)))
   cat("\n")
 }
 ```

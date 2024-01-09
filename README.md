@@ -13,7 +13,7 @@ A continuación, se describen los componentes principales:
 
 ### Carpeta de Código (code)
 
-En la carpeta "code", se encuentra el código fuente utilizado para analizar los datos. Se encuentra en formato Rmd, R, html y pdf.
+En la carpeta "code", se encuentra el código fuente utilizado para analizar los datos. Se encuentra en formato Rmd, html y pdf.
 
 ### Carpeta de datos (data)
 
